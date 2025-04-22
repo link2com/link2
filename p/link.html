@@ -1,1 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Link</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      direction: ltr;
+      text-align: left;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .task-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      position: relative;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+    .task-button.subscribe { background-color: #dc2626; }
+    .task-button.like-video { background-color: #3b82f6; }
+    .task-button.comment-video { background-color: #8b5cf6; }
+    .task-button.follow-instagram { background-color: #ec4899; }
+    .task-button.follow-tiktok { background-color: #000; }
+    .task-button.join-telegram { background-color: #2563eb; }
+    .task-button.join-whatsapp { background-color: #22c55e; }
+    .task-button.password { background-color: #374151; }
+    .task-button.completed {
+      background-color: #28a745;
+    }
+    .task-button img {
+      width: 24px;
+      margin-right: 10px;
+    }
+    .task-button .spinner {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 4px solid #fff;
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    .task-button.loading .spinner {
+      display: inline-block;
+    }
+    .task-button.loading span {
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .progress {
+      width: 100%;
+      padding: 15px;
+      background-color: #e5e7eb;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #6b7280;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+    .progress.completed {
+      background-color: #28a745;
+      color: white;
+    }
+    .download-button {
+      width: 100%;
+      padding: 15px;
+      background-color: #3b82f6;
+      border: none;
+      border-radius: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s, opacity 0.3s;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+    .download-button:disabled {
+      background-color: #a0c4ff;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .download-button:hover:not(:disabled) {
+      background-color: #2563eb;
+    }
+    .language-selector {
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #d1d5db;
+      background-color: #fff;
+      width: 100%;
+      max-width: 200px;
+    }
+    .footer-text {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+    .task-title {
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+    .task-note {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #666;
+      text-align: center;
+    }
+    .loading-message {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #2563eb;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+    .error-message {
+      margin-bottom: 20px;
+      font-size: 16px;
+      color: #ff0000;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+    .retry-btn {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+      margin-top: 10px;
+      text-align: center; /* محاذاة النص في المنتصف */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <select id="languageSelector" class="language-selector" onchange="changeLanguage()">
+      <option value="en">English</option>
+      <option value="ar">العربية</option>
+      <option value="fr">Français</option>
+      <option value="es">Español</option>
+      <option value="de">Deutsch</option>
+    </select>
+    <div id="taskTitle" class="task-title"></div>
+    <div id="taskNote" class="task-note"></div>
+    <div id="loadingMessage" class="loading-message">Loading data...</div>
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+    <div id="taskButtons" style="display: none;"></div>
+    <div id="progress" class="progress" style="display: none;"></div>
+    <div id="downloadButtons" style="display: none;"></div>
+    <div class="footer-text">Made with myLink2Unlock</div>
+  </div>
 
+  <script>
+    const translations = {
+      en: {
+        subscribe: "Subscribe",
+        likevideo: "Like Video",
+        commentvideo: "Comment Video",
+        followinstagram: "Follow Instagram",
+        followtiktok: "Follow Tiktok",
+        jointelegram: "Join Telegram",
+        joinwhatsapp: "Join WhatsApp",
+        password: "Password",
+        taskcompleted: "Complete",
+        progress: "Unlock Progress",
+        progresscompleted: "Unlock Progress",
+        download: "Download",
+        error: "Invalid link",
+        loading: "Loading data...",
+        fetchError: "Error fetching data",
+        retry: "Retry"
+      },
+      ar: {
+        subscribe: "اشترك",
+        likevideo: "إعجاب بالفيديو",
+        commentvideo: "تعليق على الفيديو",
+        followinstagram: "متابعة إنستغرام",
+        followtiktok: "متابعة تيك توك",
+        jointelegram: "انضم إلى تيليجرام",
+        joinwhatsapp: "انضم إلى واتساب",
+        password: "كلمة المرور",
+        taskcompleted: "تم",
+        progress: "فتح التقدم",
+        progresscompleted: "فتح التقدم",
+        download: "تحميل",
+        error: "الرابط غير صالح",
+        loading: "جارٍ تحميل البيانات...",
+        fetchError: "خطأ في جلب البيانات",
+        retry: "إعادة المحاولة"
+      },
+      fr: {
+        subscribe: "S'abonner",
+        likevideo: "Aimer la vidéo",
+        commentvideo: "Commenter la vidéo",
+        followinstagram: "Suivre Instagram",
+        followtiktok: "Suivre TikTok",
+        jointelegram: "Rejoindre Telegram",
+        joinwhatsapp: "Rejoindre WhatsApp",
+        password: "Mot de passe",
+        taskcompleted: "Terminé",
+        progress: "Progression de déverrouillage",
+        progresscompleted: "Progression de déverrouillage",
+        download: "Télécharger",
+        error: "Lien invalide",
+        loading: "Chargement des données...",
+        fetchError: "Erreur lors de la récupération des données",
+        retry: "Réessayer"
+      },
+      es: {
+        subscribe: "Suscribirse",
+        likevideo: "Dar me gusta al video",
+        commentvideo: "Comentar el video",
+        followinstagram: "Seguir en Instagram",
+        followtiktok: "Seguir en TikTok",
+        jointelegram: "Unirse a Telegram",
+        joinwhatsapp: "Unirse a WhatsApp",
+        password: "Contraseña",
+        taskcompleted: "Completado",
+        progress: "Progreso de desbloqueo",
+        progresscompleted: "Progreso de desbloqueo",
+        download: "Descargar",
+        error: "Enlace no válido",
+        loading: "Cargando datos...",
+        fetchError: "Error al obtener datos",
+        retry: "Reintentar"
+      },
+      de: {
+        subscribe: "Abonnieren",
+        likevideo: "Video liken",
+        commentvideo: "Video kommentieren",
+        followinstagram: "Instagram folgen",
+        followtiktok: "TikTok folgen",
+        jointelegram: "Telegram beitreten",
+        joinwhatsapp: "WhatsApp beitreten",
+        password: "Passwort",
+        taskcompleted: "Abgeschlossen",
+        progress: "Freischaltfortschritt",
+        progresscompleted: "Freischaltfortschritt",
+        download: "Herunterladen",
+        error: "Ungültiger Link",
+        loading: "Daten werden geladen...",
+        fetchError: "Fehler beim Abrufen der Daten",
+        retry: "Wiederholen"
+      }
+    };
+
+    let currentLanguage = 'en';
+    let completedTasks = 0;
+    let totalTasks = 0;
+    let config = null;
+
+    // جلب البيانات الحساسة من Config
+    async function loadConfig() {
+      try {
+        const referer = window.location.origin;
+        const response = await fetch(`https://script.google.com/macros/s/AKfycbwQ0B5ZTB82eyMow7b-TZ1XcG5ONcfdO3Xult0JxsIwJGbt0fgHCux6OCiBO7VlJ-ty/exec?action=getConfig&referer=${encodeURIComponent(referer)}`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit',
+          signal: AbortSignal.timeout(5000) // مهلة زمنية 5 ثوانٍ
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status} - ${await response.text()}`);
+        }
+
+        const text = await response.text();
+        console.log('Config response:', text); // لتسجيل الاستجابة
+        config = JSON.parse(text);
+
+        if (config.error) {
+          console.error('Error in config response:', config.error);
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error loading config:', error.message);
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorMessage').innerHTML = `${translations[currentLanguage].fetchError}: ${error.message}<br><button class="retry-btn" onclick="fetchUrlData()">Retry</button>`;
+        return false;
+      }
+    }
+
+    // دالة لإعادة المحاولة مع تأخير
+    async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url, {
+            ...options,
+            signal: AbortSignal.timeout(5000) // مهلة زمنية 5 ثوانٍ
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status} - ${response.statusText}`);
+          }
+          return response;
+        } catch (error) {
+          if (i === retries - 1) throw error; // إذا كانت هذه المحاولة الأخيرة، ارمي الخطأ
+          console.warn(`Attempt ${i + 1} failed. Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    function changeLanguage() {
+      currentLanguage = document.getElementById('languageSelector').value;
+      updateLanguage();
+    }
+
+    function updateLanguage() {
+      const t = translations[currentLanguage];
+      const taskButtons = document.querySelectorAll('.task-button');
+      const progress = document.getElementById('progress');
+      const downloadButtons = document.querySelectorAll('.download-button');
+      const loadingMessage = document.getElementById('loadingMessage');
+      const errorMessage = document.getElementById('errorMessage');
+
+      taskButtons.forEach(button => {
+        const taskTypeKey = button.dataset.taskType.toLowerCase().replace(/\s+/g, '');
+        const taskText = t[taskTypeKey] || button.dataset.taskType; // عرض اسم المهمة كما هو إذا لم يتم العثور على ترجمة
+        if (button.classList.contains('completed')) {
+          button.querySelector('span').textContent = t.taskcompleted;
+        } else {
+          button.querySelector('span').textContent = taskText;
+        }
+      });
+
+      progress.textContent = `${t.progress} ${completedTasks}/${totalTasks}`;
+      if (completedTasks === totalTasks) {
+        progress.textContent = `${t.progresscompleted} ${completedTasks}/${totalTasks}`;
+      }
+
+      downloadButtons.forEach(button => {
+        if (!button.dataset.customText) {
+          button.textContent = t.download;
+        }
+      });
+
+      loadingMessage.textContent = t.loading;
+
+      if (errorMessage.style.display !== 'none') {
+        const errorText = errorMessage.textContent.split(':')[0]; // استخراج النص قبل الخطأ
+        errorMessage.innerHTML = `${t.fetchError}: ${errorMessage.textContent.split(':')[1] || ''}<br><button class="retry-btn" onclick="fetchUrlData()">${t.retry}</button>`;
+      }
+
+      document.body.style.direction = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+      document.body.style.textAlign = currentLanguage === 'ar' ? 'right' : 'left';
+    }
+
+    async function fetchUrlData() {
+      if (!config) {
+        const configLoaded = await loadConfig();
+        if (!configLoaded) return;
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const shortId = urlParams.get('id');
+      if (!shortId) {
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorMessage').innerHTML = translations[currentLanguage].error;
+        return;
+      }
+
+      try {
+        const response = await fetchWithRetry(`${config.API_URL}?id=${shortId}`, {
+          method: 'GET',
+          mode: 'cors',
+          credentials: 'omit'
+        }, 3, 2000); // 3 محاولات مع تأخير 2 ثانية
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        const taskTitle = document.getElementById('taskTitle');
+        const taskNote = document.getElementById('taskNote');
+        if (data.title) {
+          taskTitle.textContent = data.title;
+        }
+        if (data.note) {
+          taskNote.textContent = data.note;
+        }
+
+        const taskButtonsDiv = document.getElementById('taskButtons');
+        const progress = document.getElementById('progress');
+        const downloadButtonsDiv = document.getElementById('downloadButtons');
+
+        // إخفاء رسالة التحميل وإظهار المحتوى
+        document.getElementById('loadingMessage').style.display = 'none';
+        taskButtonsDiv.style.display = 'block';
+        progress.style.display = 'block';
+        downloadButtonsDiv.style.display = 'block';
+
+        // إضافة أزرار المهام ديناميكيًا
+        const taskTypes = data.taskTypes || [];
+        const taskURLs = data.taskURLs || [];
+        totalTasks = taskTypes.length;
+        completedTasks = 0;
+        progress.textContent = `${translations[currentLanguage].progress} ${completedTasks}/${totalTasks}`;
+
+        taskTypes.forEach((taskType, index) => {
+          const taskURL = taskURLs[index];
+          const button = document.createElement('button');
+          button.classList.add('task-button', taskType.toLowerCase().replace(/\s+/g, '-'));
+          button.dataset.taskType = taskType;
+          let iconSrc;
+          switch (taskType) {
+            case 'Subscribe':
+            case 'Like Video':
+            case 'Comment Video':
+              iconSrc = 'https://cdn-icons-png.flaticon.com/512/1384/1384060.png';
+              break;
+            case 'Follow Instagram':
+              iconSrc = 'https://cdn-icons-png.flaticon.com/512/2111/2111463.png';
+              break;
+            case 'Follow Tiktok':
+              iconSrc = 'https://cdn-icons-png.flaticon.com/512/3046/3046127.png';
+              break;
+            case 'Join Telegram':
+              iconSrc = 'https://cdn-icons-png.flaticon.com/512/2111/2111499.png';
+              break;
+            case 'Join WhatsApp':
+              iconSrc = 'https://cdn-icons-png.flaticon.com/512/733/733585.png';
+              break;
+            case 'Password':
+              iconSrc = 'https://cdn-icons-png.flaticon.com/512/3064/3064155.png';
+              break;
+          }
+          const taskTypeKey = taskType.toLowerCase().replace(/\s+/g, '');
+          const taskText = translations[currentLanguage][taskTypeKey] || taskType;
+          button.innerHTML = `
+            <img src="${iconSrc}" alt="${taskType} Icon">
+            <span>${taskText}</span>
+            <div class="spinner"></div>
+          `;
+          taskButtonsDiv.appendChild(button);
+
+          button.addEventListener('click', () => {
+            if (taskType === 'Password') {
+              alert(`Password: ${taskURL}`);
+            } else {
+              window.open(taskURL, '_blank');
+            }
+            button.classList.add('loading');
+            button.disabled = true;
+            setTimeout(() => {
+              button.classList.remove('loading');
+              button.classList.add('completed');
+              button.querySelector('span').textContent = translations[currentLanguage].taskcompleted;
+              completedTasks++;
+              progress.textContent = `${translations[currentLanguage].progress} ${completedTasks}/${totalTasks}`;
+              if (completedTasks === totalTasks) {
+                progress.classList.add('completed');
+                progress.textContent = `${translations[currentLanguage].progresscompleted} ${completedTasks}/${totalTasks}`;
+                const downloadButtons = document.querySelectorAll('.download-button');
+                downloadButtons.forEach(button => {
+                  button.disabled = false;
+                });
+              }
+            }, 10000);
+          });
+        });
+
+        // إضافة أزرار التحميل ديناميكيًا
+        const downloads = [
+          { url: data.longUrl1, text: data.downloadText1 },
+          { url: data.longUrl2, text: data.downloadText2 },
+          { url: data.longUrl3, text: data.downloadText3 },
+          { url: data.longUrl4, text: data.downloadText4 }
+        ];
+
+        downloads.forEach((download, index) => {
+          if (download.url) {
+            const button = document.createElement('button');
+            button.classList.add('download-button');
+            button.disabled = true;
+            button.textContent = download.text || translations[currentLanguage].download;
+            if (download.text) button.dataset.customText = download.text;
+            downloadButtonsDiv.appendChild(button);
+
+            button.addEventListener('click', () => {
+              window.open(download.url, '_blank');
+            });
+          }
+        });
+
+        updateLanguage(); // تحديث اللغة بعد تحميل البيانات
+      } catch (error) {
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('errorMessage').innerHTML = `${translations[currentLanguage].fetchError}: ${error.message}<br><button class="retry-btn" onclick="fetchUrlData()">${translations[currentLanguage].retry}</button>`;
+      }
+    }
+
+    // تحميل البيانات عند تحميل الصفحة
+    window.onload = () => {
+      fetchUrlData();
+    };
+  </script>
+</body>
+</html>
